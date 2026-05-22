@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ホームページ読み上げシステム(Web版) </title>
+<style>
+  body { font:14px/1.4 system-ui,sans-serif; margin:12px; width:360px; color:#111; }
+  label { display:block; margin-top:8px; color:#555; }
+  input, button, select { font-size:14px; padding:6px 8px; border-radius:8px; border:1px solid #cfd9e6; }
+  button { margin-top:8px; cursor:pointer; }
+  .row { display:flex; gap:8px; align-items:center; }
+  .row>*{ flex:1; }
+  small { color:#777; }
+</style>
+
+<h3>ホームページ読み上げシステム(Web版) Chrome拡張機能利用版</h3>
+
+<label>音声（日本語優先で一覧）</label>
+<div class="row">
+  <select id="voiceList"><option value="">読み込み中…</option></select>
+  <button id="reloadVoices" title="音声リストを再読み込み">⟳</button>
+</div>
+
+<div class="row">
+  <div>
+    <label>速度</label>
+    <input id="rate" type="number" min="0.25" max="4" step="0.1" value="1.0">
+  </div>
+  <div>
+    <label>ピッチ</label>
+    <input id="pitch" type="number" min="-20" max="20" step="0.1" value="0">
+  </div>
+</div>
+
+<!-- 既定で「ふりがな優先」をON -->
+<label style="display:flex; align-items:center; gap:8px;">
+  <input type="checkbox" id="preferRubyRt" checked>
+  ふりがなを優先する（rtを読み、漢字は読まない）
+</label>
+<label style="display:flex; align-items:center; gap:8px;">
+  <input type="checkbox" id="ignoreRubyRt">
+  ふりがなを無視する（rbのみ読む）
+</label>
+<small>※ どちらもオフのときはページの見た目どおり（rb+rt）で読みます。</small>
+
+<div class="row">
+  <button id="speakSelection">▶ 選択テキストを読み上げ</button>
+  <button id="speakWhole">▶ ページ全体を読み上げ</button>
+</div>
+<div class="row">
+  <button id="pauseResume">⏸ 一時停止/再開</button>
+  <button id="stop">■ 停止</button>
+</div>
+
+<hr>
+
+<label>URL（新規タブで開いて自動読み上げ）</label>
+<input id="url" placeholder="https://example.com/article">
+<button id="openAndRead">URLを開いて全体を読み上げ</button>
+
+<hr>
+<button id="toggleFloat">フロートパネルを表示/非表示</button>
+
+<small>※ ruby処理を有効にするとハイライトはオフになります（テキスト差異のため）。</small>
+
+<script src="popup.js"></script>

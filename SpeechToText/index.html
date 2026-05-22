@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>バリアフリー会話システム(Web版)</title>
+<style>
+  :root{--bg:#fafafa;--card:#fff;--muted:#667085;--accent:#2563eb}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#111;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+  header{padding:16px 20px;font-weight:700;font-size:20px;border-bottom:1px solid #eee;background:#fff}
+  main{padding:16px;max-width:1380px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:380px 1fr 1fr;gap:16px}
+  .card{background:var(--card);border:1px solid #eee;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card h2{margin:0;padding:14px 16px;border-bottom:1px solid #eee;font-size:16px}
+  .card .body{padding:14px 16px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  input,select,textarea,button{font:inherit}
+  input[type=text],input[type=password],select,textarea{
+    width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:10px;background:#fff
+  }
+  textarea{min-height:120px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #d0d5dd;background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.danger{background:#ef4444;color:#fff;border-color:#ef4444}
+  .muted{color:var(--muted);font-size:12px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .mono{font-family:ui-monospace,Consolas,Menlo,monospace;font-size:12px}
+  .box{border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;min-height:160px;background:#fff;overflow:auto}
+  .live{background:#f7fbff;border-color:#dbeafe}
+  .segment{padding:6px 8px;border-radius:8px;margin-bottom:6px;background:#fff}
+  .segment.hl{background:#fff8db;border-color:#f2e8a6}
+  .flex{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .toggle label{display:inline-flex;gap:6px;align-items:center;font-size:14px}
+</style>
+</head>
+<body>
+<header>バリアフリー会話システム（Web版）（日本語音声⇒日本語テキスト＋英語テキスト）</header>
+  <h4>　　　　※このままでは動きません。README.mdを読んでローカルで動作させてください。</h4>
+<main class="grid">
+
+  <!-- 設定 -->
+  <section class="card">
+    <h2>設定</h2>
+    <div class="body stack">
+      <div>
+        <label>エンドポイントURL（Open WebUI: <span class="mono">http://localhost:3000/api/v1/chat/completions</span> / LM Studio: <span class="mono">http://localhost:1234/v1/chat/completions</span>）</label>
+        <input id="endpoint" type="text" value="http://localhost:3000/api/v1/chat/completions">
+      </div>
+      <div class="row">
+        <div>
+          <label>モデル名</label>
+          <!-- <input id="model" type="text" value="gemma3:1b"> -->
+          <input id="model" type="text" value="qwen2.5:latest">
+        </div>
+        <div>
+          <label>認識言語</label>
+          <select id="lang">
+            <option value="ja-JP" selected>日本語（ja-JP）</option>
+            <option value="en-US">英語（en-US）</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>APIキー（Open WebUI で APIキー有効時のみ。LM Studio は不要）</label>
+        <input id="apiKey" type="password" placeholder="sk-                             ">
+      </div>
+
+      <!-- 送信モードトグル -->
+      <div class="toggle">
+        <label>送信モード</label>
+        <div class="flex">
+          <label><input type="radio" name="mode" value="post" checked> 後処理（POST）</label>
+          <label><input type="radio" name="mode" value="sse"> ストリーム（SSE）</label>
+          <button id="testBtn" class="btn">✓ 接続テスト（/models）</button>
+          <span id="testResult" class="muted"></span>
+        </div>
+      </div>
+
+      <!-- <div>
+        <label>校正指示（system）</label>
+        <textarea id="sysPrompt">あなたは日本語の校正エンジンです。誤変換の修正、読みやすい句読点の挿入、表記ゆれの統一、冗長表現の簡潔化を行います。出力は「校正後のテキストのみ」。前置き・後置き・説明・相槌・引用符・箇条書き・コードブロックは禁止。与えられた文の順序を保ち、文意は変えないでください。</textarea>
+      </div> -->
+      <div>
+        <label>校正指示（system）</label>
+        <textarea id="sysPrompt">あなたは翻訳エンジンです。入力される日本語を正しい自然な英語に翻訳してください。
+出力は翻訳文のみとし、説明、注釈、校正、日本語の繰り返し、例文などは一切付けてはいけません。</textarea>
+      </div>
+      <div class="flex">
+        <button id="startBtn" class="btn primary">▶ 開始（マイク）</button>
+        <button id="stopBtn" class="btn danger">■ 停止</button>
+        <button id="clearBtn" class="btn">⟲ クリア</button>
+      </div>
+      <div class="muted">※ ブラウザのマイク許可が必要です。Web Speech API は Chrome/Edge 推奨。</div>
+    </div>
+  </section>
+
+  <!-- 中：文字起こし -->
+  <section class="card">
+    <h2>文字起こし</h2>
+    <div class="body stack">
+      <div>
+        <label>ライブ（途中経過）</label>
+        <div id="liveBox" class="box live"></div>
+      </div>
+      <div>
+        <label>確定（最終結果・この文だけ校正に送る）</label>
+        <div id="finalBox" class="box"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右：校正結果のみ -->
+  <section class="card">
+    <h2>校正テキスト（AIの相槌や解説は表示しない）</h2>
+    <div class="body">
+      <div id="fixedBox" class="box" style="min-height:360px;"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+
+// 要素
+const endpointEl = $('#endpoint');
+const modelEl    = $('#model');
+const keyEl      = $('#apiKey');
+const langEl     = $('#lang');
+const liveBox    = $('#liveBox');
+const finalBox   = $('#finalBox');
+const fixedBox   = $('#fixedBox');
+const testBtn    = $('#testBtn');
+const testResult = $('#testResult');
+
+// ヘッダ
+function headers() {
+  const k = keyEl.value.trim();
+  const h = { 'Content-Type': 'application/json' };
+  if (k) {
+    h['Authorization'] = `Bearer ${k}`;
+    h['X-API-Key'] = k;                  // 互換系
+    h['X-OpenWebUI-Api-Key'] = k;        // Open WebUI系
+  }
+  return h;
+}
+
+// /models テスト
+async function testModels() {
+  testResult.textContent = '接続中…';
+  try {
+    const u = new URL(endpointEl.value.trim());
+    const res = await fetch(`${u.origin}/api/v1/models`, { headers: headers() });
+    testResult.textContent = res.ok ? 'OK: 200' : `NG: ${res.status} ${res.statusText}`;
+  } catch (e) {
+    testResult.textContent = 'URL不正/通信失敗';
+  }
+}
+testBtn.addEventListener('click', testModels);
+
+// 送信モード
+const modeEl = () => document.querySelector('input[name="mode"]:checked')?.value || 'post';
+
+// ========== ここから：マイク権限パッチ ==========
+let micGranted = false;
+let micDenied  = false;
+
+async function askMicPermissionOnce() {
+  if (micGranted || micDenied) return micGranted;
+  if (!navigator.mediaDevices?.getUserMedia) return true; // 古い環境はスキップ
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop());
+    micGranted = true;
+    return true;
+  } catch (e) {
+    micDenied = true;
+    alert('マイク権限が許可されていません。アドレスバーの🔒→サイトの設定→マイクを「許可」にしてください。');
+    return false;
+  }
+}
+// ========== ここまで：マイク権限パッチ ==========
+
+// Web Speech API
+let recog = null;
+let running = false;
+function createRecognizer() {
+  const R = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!R) { alert('このブラウザは Web Speech API（音声認識）に未対応です。'); return null; }
+  const r = new R();
+  r.lang = langEl.value || 'ja-JP';
+  r.continuous = true;
+  r.interimResults = true;
+  return r;
+}
+function showLive(text){ liveBox.textContent = text || ''; }
+function appendFinal(text){
+  const div = document.createElement('div');
+  div.className = 'segment hl';
+  div.textContent = text;
+  finalBox.appendChild(div);
+  finalBox.scrollTop = finalBox.scrollHeight;
+  setTimeout(()=>div.classList.remove('hl'), 500);
+}
+function appendFixed(text){
+  const seg = document.createElement('div');
+  seg.className = 'segment';
+  seg.textContent = text;
+  fixedBox.appendChild(seg);
+  fixedBox.scrollTop = fixedBox.scrollHeight;
+}
+
+// 文を校正（POST or SSE）
+async function fixSentence(sentence) {
+  const endpoint = endpointEl.value.trim();
+  const model    = modelEl.value.trim();
+  const sys      = $('#sysPrompt').value.trim();
+  const mode     = modeEl();
+
+  const base = {
+    model,
+    temperature: 0.2,
+    messages: [
+      { role: 'system', content: sys },
+      { role: 'user',   content: sentence }
+    ],
+    max_tokens: 256
+  };
+
+  // 右側の表示領域を先に確保（SSEでも流し込み）
+  const seg = document.createElement('div');
+  seg.className = 'segment';
+  seg.textContent = '';
+  fixedBox.appendChild(seg);
+
+  try {
+    if (mode === 'post') {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ ...base, stream: false })
+      });
+      if (!res.ok) { seg.textContent = `（HTTP ${res.status}）校正に失敗`; return; }
+      const json = await res.json();
+      const out = json?.choices?.[0]?.message?.content ?? json?.choices?.[0]?.text ?? '';
+      const cleaned = out.replace(/^(はい|了解(です|しました)|承知しました)[。．、,]?\s*/i,'').trim();
+      if (!cleaned) { seg.remove(); return; }
+      seg.textContent = cleaned;
+      fixedBox.scrollTop = fixedBox.scrollHeight;
+      return;
+    }
+
+    // SSE
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ ...base, stream: true })
+    });
+    if (!res.ok) { seg.textContent = `（HTTP ${res.status}）SSE開始に失敗`; return; }
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() ?? '';
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') { buffer = ''; break; }
+        try {
+          const j = JSON.parse(data);
+          const delta = j.choices?.[0]?.delta?.content ?? '';
+          if (delta) {
+            seg.textContent += delta;
+            fixedBox.scrollTop = fixedBox.scrollHeight;
+          }
+        } catch (_) {}
+      }
+    }
+    seg.textContent = seg.textContent.replace(/^(はい|了解(です|しました)|承知しました)[。．、,]?\s*/i,'').trim();
+    if (!seg.textContent) seg.remove();
+
+  } catch (e) {
+    seg.textContent = `（通信エラー）${e.message}`;
+  }
+}
+
+// 開始/停止/クリア
+async function start(){
+  if (running) return;
+
+  // ★ パッチ：開始前に一度だけマイク権限を取得
+  const ok = await askMicPermissionOnce();
+  if (!ok) return; // 拒否の場合は何もしない（ダイアログ無限ループ防止）
+
+  recog = createRecognizer();
+  if (!recog) return;
+
+  liveBox.textContent = '';
+  recog.onresult = (ev)=>{
+    let live = '';
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const res = ev.results[i];
+      const txt = res[0].transcript;
+      if (res.isFinal) {
+        const s = txt.trim();
+        if (s) { appendFinal(s); fixSentence(s); }
+      } else { live += txt; }
+    }
+    showLive(live);
+  };
+
+  // ★ パッチ：拒否や停止後に無限再起動しない
+  recog.onend = () => {
+    if (running && micGranted) { try{ recog.start(); }catch{} }
+  };
+
+  try { recog.start(); running = true; }
+  catch (e) {
+    if (e.name === 'NotAllowedError') {
+      micDenied = true;
+      running = false;
+    } else {
+      alert('マイク開始に失敗: ' + e.message);
+    }
+  }
+}
+function stop(){ running = false; try{ recog && recog.stop(); }catch{} }
+function clearAll(){ liveBox.textContent=''; finalBox.innerHTML=''; fixedBox.innerHTML=''; }
+
+$('#startBtn').addEventListener('click', start);
+$('#stopBtn').addEventListener('click', stop);
+$('#clearBtn').addEventListener('click', clearAll);
+
+// スペースで開始/停止（フォーカスが入力要素でない時）
+document.addEventListener('keydown', (e)=>{
+  const tag = document.activeElement?.tagName;
+  if (e.code==='Space' && !['INPUT','TEXTAREA','SELECT'].includes(tag)) {
+    e.preventDefault();
+    running ? stop() : start();
+  }
+});
+</script>
+</body>
+</html>
