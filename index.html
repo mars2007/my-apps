@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>my-apps | アプリケーション・作品ポートフォリオ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a73e8;    /* easy-three風のアクセントブルー */
+            --primary-hover: #155cb8;
+            --bg-color: #f8f9fa;         /* 清潔感のある薄いグレー背景 */
+            --text-color: #202124;       /* 読みやすいダークグレー文字 */
+            --card-bg: #ffffff;
+            --border-color: #dadce0;
+            --code-bg: #24292e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 固定型ヘッダーナビゲーション */
+        header.nav-header {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: #5f6368;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* ヒーローセクション（トップ紹介） */
+        .hero {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 140px 20px 50px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #5f6368;
+            margin-bottom: 20px;
+        }
+
+        .badges {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #24292e;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .badge.mono { background: #6f42c1; }
+        .badge.env { background: #28a745; }
+
+        .hero p.intro-text {
+            font-size: 1.15rem;
+            color: #5f6368;
+            max-width: 750px;
+            margin: 0 auto 35px auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 6px rgba(26,115,232,0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #fff;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f1f3f4;
+        }
+
+        /* メメインコンテンツコンテナ */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* カテゴリ タイトルスタイル */
+        .category-title {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            margin-top: 60px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* アプリケーション・グリッド */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        /* マージ＆洗練したアプリカードデザイン */
+        .app-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary-color);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: #e8f0fe;
+            color: var(--primary-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            align-self: flex-start;
+        }
+
+        .app-description {
+            font-size: 0.95rem;
+            color: #5f6368;
+            line-height: 1.5;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            text-align: right;
+            margin-top: 20px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        .app-card:hover .card-footer {
+            color: var(--primary-hover);
+        }
+
+        /* リポジトリ・利用方法セクション */
+        .repo-info-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 35px;
+            margin-top: 70px;
+            margin-bottom: 40px;
+        }
+
+        .repo-info-section h3 {
+            font-size: 1.3rem;
+            margin: 25px 0 10px 0;
+            color: var(--text-color);
+        }
+
+        .repo-info-section h3:first-child {
+            margin-top: 0;
+        }
+
+        .repo-info-section ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #3c4043;
+        }
+
+        .repo-info-section li {
+            margin-bottom: 8px;
+        }
+
+        /* コードブロック表示 */
+        pre {
+            background-color: var(--code-bg);
+            color: #f8f9fa;
+            padding: 18px;
+            border-radius: 8px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.88rem;
+            overflow-x: auto;
+            margin: 12px 0 24px 0;
+        }
+
+        /* ライセンス・免責事項ボックス */
+        .license-box {
+            font-size: 0.88rem;
+            color: #5f6368;
+            border-left: 4px solid var(--border-color);
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #80868b;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            background-color: #fff;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="#" class="logo">my-apps</a>
+            <nav class="nav-links">
+                <a href="#projects">リポジトリ内開発ツール</a>
+                <a href="#web-works">Web作品リンク集</a>
+                <a href="#usage">利用方法・環境</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Fumiaki Masakiyo</h1>
+        <h2>Programming & Works</h2>
+        <div class="badges">
+            <span class="badge mono">Repository: Monorepo</span>
+            <span class="badge env">Environment: Web & Desktop</span>
+            <span class="badge">Open Source</span>
+        </div>
+        <p class="intro-text">研究室・講義・個人開発等で作成したゲーム、シミュレーション、Webアプリケーション、各種ツール一式をまとめた統合型ポートフォリオです。</p>
+        <div class="cta-buttons">
+            <a href="#projects" class="btn btn-primary">作品コレクションを閲覧</a>
+            <a href="https://github.com/mars2007/my-apps" class="btn btn-secondary" target="_blank"><i class="fa-brands fa-github"></i> GitHub</a>
+        </div>
+    </section>
+
+    <main class="container">
+        
+        <section id="projects">
+            <h2 class="category-title"><i class="fa-solid fa-box-open"></i> GitHub リポジトリ収録ソースコード</h2>
+            <div class="app-grid">
+                
+                <a href="https://mars2007.github.io/my-apps/EasyEnglishChat/index.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                    <h3 class="app-title">やさしい英会話練習システム</h3>
+                    <span class="tech-tag">HTML / CSS / JS</span>
+                    <p class="app-description">英語でのチャットや会話を手軽に行える学習支援ツール。音声速度調整機能付き。外部APIキーの設定不要、完全無料で利用可能です。</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <div class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-comment-dots"></i></div>
+                    <h3 class="app-title">バリアフリー会話システム</h3>
+                    <span class="tech-tag">Web Speech API</span>
+                    <p class="app-description">【Web版】マイクから取り込んだ音声をリアルタイムでキャッチし、高精度でクリアなテキストへ変換・表示するアクセシビリティ支援システムです。</p>
+                    <div class="card-footer" style="color:#80868b;">リポジトリ内フォルダ参照</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-volume-high"></i></div>
+                    <h3 class="app-title">ホームページ読み上げシステム</h3>
+                    <span class="tech-tag">Manifest V3 / Chrome Ext</span>
+                    <p class="app-description">【Web版】Webサイト上のふりがな（ルビ）の適切な読み分けや、ブラウザ側に常駐して直感的に操作できる便利なChrome拡張機能です。</p>
+                    <div class="app-footer" style="margin-top:15px; font-size:0.9rem; color:#80868b; text-align:right;">拡張機能として導入</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                    <h3 class="app-title">Transparent Whiteboard</h3>
+                    <span class="tech-tag">Windows デスクトップ版</span>
+                    <p class="app-description">パソコンのデスクトップ画面上に透明なレイヤーを重ね合わせ、画面を隠すことなく上から直接フリーハンドでメモや図形を描画できるデスクトップツールです。</p>
+                    <div class="card-footer" style="color:#80868b;">リポジトリ内フォルダ参照</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-video"></i></div>
+                    <h3 class="app-title">WebCamWipeWindow</h3>
+                    <span class="tech-tag">Windows デスクトップ版</span>
+                    <p class="app-description">接続されたウェブカメラのリアルタイム映像を活用し、画面上にユニークな形で重ね合わせやレイアウト、ウィンドウ切り抜き操作を行うプレゼン・収録支援ツール。</p>
+                    <div class="card-footer" style="color:#80868b;">リポジトリ内フォルダ参照</div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="web-works">
+            
+            <h2 class="category-title"><i class="fa-solid fa-robot"></i> AI Systems (Web版)</h2>
+            <div class="app-grid">
+                <a href="https://mars2007.github.io/my-apps/EasyEnglishChat/index.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+                    <h3 class="app-title">Easy English</h3>
+                    <p class="app-description">やさしい英会話システム(PC+Chrome)</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+            </div>
+
+            <h2 class="category-title"><i class="fa-solid fa-chart-line"></i> Simulation & Visuals</h2>
+            <div class="app-grid">
+                <a href="https://ss413589.stars.ne.jp/files/prog/kabuka.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <h3 class="app-title">World Kabuka</h3>
+                    <p class="app-description">リアルタイム世界株価ボード</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/visual_func20250226.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-project-diagram"></i></div>
+                    <h3 class="app-title">Visual Func Prog</h3>
+                    <p class="app-description">Visual関数型プログラミング・視覚シミュレータ</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/buttai.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-eye"></i></div>
+                    <h3 class="app-title">Object Recognition</h3>
+                    <p class="app-description">ブラウザカメラを用いた物体認識デモ</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/pose.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-person-running"></i></div>
+                    <h3 class="app-title">Pose Estimation</h3>
+                    <p class="app-description">骨格・ポーズ推定シミュレーション</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/gazou_syori22_renzoku_filter.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-image"></i></div>
+                    <h3 class="app-title">Image Processing</h3>
+                    <p class="app-description">連続フィルタを用いた高度なリアルタイム画像処理デモ</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/scraping.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-spider"></i></div>
+                    <h3 class="app-title">Web Scraping</h3>
+                    <p class="app-description">データ抽出・Webスクレイピングデモンストレーション</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/taiyoukei_sim.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-sun"></i></div>
+                    <h3 class="app-title">Solar System</h3>
+                    <p class="app-description">万有引力に基づく太陽系天体シミュレーション</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/CFD_analysis.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-wind"></i></div>
+                    <h3 class="app-title">CFD Analysis</h3>
+                    <p class="app-description">2次元流体計算・風洞シミュレーション</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/mandelbrot.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-infinity"></i></div>
+                    <h3 class="app-title">Mandelbrot</h3>
+                    <p class="app-description">フラクタル構造・マンデルブロー集合のリアルタイム描画</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/tornado.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-tornado"></i></div>
+                    <h3 class="app-title">Tornado</h3>
+                    <p class="app-description">3次元パーティクルを用いた竜巻風のアート表現</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/aurora_3_d_art.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3 class="app-title">Aurora 3D Art</h3>
+                    <p class="app-description">数理モデルによる美麗なオーロラ風グラフィックス表現</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+            </div>
+
+            <h2 class="category-title"><i class="fa-solid fa-gamepad"></i> Games</h2>
+            <div class="app-grid">
+                <a href="https://ss413589.stars.ne.jp/files/prog/Cannon_3D_Revolution.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <h3 class="app-title">3D Cannon Revolution</h3>
+                    <p class="app-description">迫力のある奥域をもった3Dシューティングゲーム</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/tetris.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+                    <h3 class="app-title">Tetris</h3>
+                    <p class="app-description">定番落ち物パズルゲームのロジック再現</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/RPG/rpg.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-dungeon"></i></div>
+                    <h3 class="app-title">RPG (Business Quest)</h3>
+                    <p class="app-description">マップ探索型の本格ロールプレイングゲーム</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/shooting.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-jet-fighter"></i></div>
+                    <h3 class="app-title">Shooting</h3>
+                    <p class="app-description">王道2Dスクロール・シューティングゲーム</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/brock_broken.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-shapes"></i></div>
+                    <h3 class="app-title">Block Breaking</h3>
+                    <p class="app-description">物理バウンスをベースにしたブロック崩しゲーム</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+
+                <a href="https://ss413589.stars.ne.jp/files/prog/shogi.html" target="_blank" class="app-card">
+                    <div class="card-icon"><i class="fa-solid fa-chess-king"></i></div>
+                    <h3 class="app-title">Shogi</h3>
+                    <p class="app-description">伝統的な将棋盤面UI（思考推論部：やねうら王 連携）</p>
+                    <div class="card-footer">起動する <i class="fa-solid fa-chevron-right"></i></div>
+                </a>
+            </div>
+        </section>
+
+        <section id="usage" class="repo-info-section">
+            <h2 class="category-title" style="text-align: left; margin-top: 0; padding-left: 0; border: none;"><i class="fa-solid fa-wrench"></i> 開発環境・基本利用方法</h2>
+            
+            <h3>1. オンライン上でのクイック起動</h3>
+            <p style="font-size: 0.95rem; color: #3c4043; margin-bottom: 15px;">
+                各カードの「起動する ➔」をクリックすると、別タブでアプリケーションが即座に起動し、Webブラウザ上でシミュレーションやゲームをお楽しみいただけます。
+            </p>
+
+            <h3>2. ローカル環境へのダウンロード（クローン）</h3>
+            <p style="font-size: 0.95rem; color: #3c4043;">
+                プロジェクトのソースコードを手元のPCにダウンロードして実行、または編集を行う場合は、以下のコマンドをターミナルで実行してください。
+            </p>
+            <pre><code>git clone https://github.com/mars2007/my-apps.git
+cd my-apps</code></pre>
+
+            <h3>💻 動作環境および採用技術一覧</h3>
+            <ul>
+                <li><strong>Frontend Web:</strong> HTML5, CSS3, JavaScript (Vanilla JS), Web Speech API (音声認識・音声合成)</li>
+                <li><strong>Desktop Apps:</strong> Windows環境向けネイティブ実行ファイルパッケージ</li>
+                <li><strong>External APIs:</strong> OpenAI 互換API対応、将棋エンジン（やねうら王推論ロジック）連携</li>
+                <li><strong>対応ブラウザ:</strong> Google Chrome / Microsoft Edge (各最新版推奨・デベロッパーモード対応)</li>
+            </ul>
+
+            <div class="license-box">
+                <p><strong>📜 免責事項・ライセンス</strong></p>
+                <p>本リポジトリ、および公開サイト内のアプリケーション群は、個人での研究・実験およびプログラミング学習、教材利用などを目的として作成されたプログラムです。ツールの利用に伴ういかなる不具合、トラブル、または損失に関しても、作成者は一切の責任を負いかねます。外部APIの仕様変更やブラウザのアップデートに伴い、予告なく動作が変更または制限される場合があります。予めご了承ください。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Copyright © 2026 mars2007. Built with GitHub Pages & Portfolio Template.</p>
+    </footer>
+
+</body>
+</html>
