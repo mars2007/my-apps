@@ -296,3 +296,5 @@ jpackage --input . --name WebcamWipeWindow --main-jar WebcamWipeWindow.jar --mai
 ---
 
 **最終更新**: 2025年11月28日
+
+![Views](https://komarev.com/ghpvc/?username=mars2007&color=blue)
