@@ -82,3 +82,5 @@ APIキー: 前のステップで Open WebUI からコピーした sk-... のキ�
 推奨ブラウザ: 音声認識エンジンにブラウザ標準の Web Speech API を使用しているため、Google Chrome または Chromium版 Microsoft Edge で動作させてください。
 
 HTTPS化について: ページをインターネット上（GitHub Pagesなど）に公開してマイク機能を使用する場合、ブラウザのセキュリティ制限により、HTTPS（暗号化通信）環境が必須となります。GitHub Pages上で動かす場合は自動でHTTPS化されるため問題ありません。
+
+![Views](https://komarev.com/ghpvc/?username=mars2007&color=blue)
