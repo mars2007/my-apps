@@ -183,3 +183,5 @@ jpackage `
 - 実行時に保存される画像は PNG 形式です。
 - ソース修正後は、再度 `javac` と `jar` を実行してから `jpackage` を行ってください。
 - `.exe` を作らず、配布フォルダだけ欲しい場合は `--type app-image` を使ってください。
+
+![Views](https://komarev.com/ghpvc/?username=mars2007&color=blue)
